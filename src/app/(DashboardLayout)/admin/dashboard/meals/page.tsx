@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   ChefHat,
   Search,
   MoreHorizontal,
   Edit,
   Trash2,
-  Plus,
   Store,
   Tag,
   DollarSign,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -42,6 +43,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 interface Meal {
   id: string;
@@ -58,31 +60,58 @@ interface Meal {
   _count?: { reviews: number; orderItems: number };
 }
 
+interface MetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export default function AdminMealsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [meta, setMeta] = useState<MetaData>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  
+  // Get current page from URL or default to 1
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   useEffect(() => {
     loadMeals();
-  }, [page]);
+  }, [currentPage]);
 
   const loadMeals = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
-        `${API_URL}/meals?page=${page}&limit=10`,
+        `${API_URL}/meals?page=${currentPage}&limit=10`,
         { credentials: "include" }
       );
       if (!res.ok) throw new Error("Failed to fetch meals");
       const result = await res.json();
-      setMeals(result.data || []);
-      setTotalPages(result.metaData?.totalPages || 1);
+      
+      // Handle different API response structures
+      const mealsData = result.data || result.meals || result;
+      const metaData = result.metaData || result.meta || {
+        page: currentPage,
+        limit: 10,
+        total: mealsData.length,
+        totalPages: Math.ceil(mealsData.length / 10)
+      };
+      
+      setMeals(mealsData);
+      setMeta(metaData);
     } catch (error) {
       toast.error("Failed to load meals");
     } finally {
@@ -128,12 +157,13 @@ export default function AdminMealsPage() {
     setDeleteDialogOpen(true);
   };
 
-  const filteredMeals = meals.filter(
-    (m) =>
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.provider?.providerProfile?.restaurantName
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase())
+  // Filter meals client-side
+  const filteredMeals = meals.filter((m) =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.provider?.providerProfile?.restaurantName
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase()) ||
+    m.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -141,9 +171,13 @@ export default function AdminMealsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">All Meals</h1>
-          <p className="text-gray-500">Manage all meals from all restaurants</p>
+          <h1 className="text-2xl font-semibold text-gray-900">All Meals</h1>
+          <p className="text-gray-500 mt-1">Manage all meals from all restaurants</p>
         </div>
+        <Button onClick={loadMeals} variant="outline" size="sm" className="gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </Button>
       </div>
 
       {/* Search */}
@@ -152,7 +186,7 @@ export default function AdminMealsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search by meal name or restaurant..."
+              placeholder="Search by meal name, restaurant, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -163,10 +197,15 @@ export default function AdminMealsPage() {
 
       {/* Meals Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardHeader>
+          <CardTitle>
+            All Meals
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
             </div>
           ) : (
             <>
@@ -193,10 +232,10 @@ export default function AdminMealsPage() {
                     </TableRow>
                   ) : (
                     filteredMeals.map((meal) => (
-                      <TableRow key={meal.id}>
+                      <TableRow key={meal.id} className="hover:bg-gray-50">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-gray-100">
+                            <div className="relative h-10 w-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                               {meal.imageUrl ? (
                                 <Image
                                   src={meal.imageUrl}
@@ -205,7 +244,9 @@ export default function AdminMealsPage() {
                                   className="object-cover"
                                 />
                               ) : (
-                                <ChefHat className="h-6 w-6 m-3 text-gray-400" />
+                                <div className="h-full w-full flex items-center justify-center">
+                                  <ChefHat className="h-5 w-5 text-gray-400" />
+                                </div>
                               )}
                             </div>
                             <div>
@@ -221,16 +262,11 @@ export default function AdminMealsPage() {
                                     <Badge
                                       key={tag}
                                       variant="secondary"
-                                      className="text-xs"
+                                      className="text-xs px-1.5 py-0"
                                     >
                                       {tag}
                                     </Badge>
                                   ))}
-                                  {meal.dietaryTags.length > 2 && (
-                                    <span className="text-xs text-gray-500">
-                                      +{meal.dietaryTags.length - 2}
-                                    </span>
-                                  )}
                                 </div>
                               )}
                             </div>
@@ -238,7 +274,7 @@ export default function AdminMealsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Store className="h-4 w-4 text-gray-400" />
+                            <Store className="h-4 w-4 text-gray-400 flex-shrink-0" />
                             <span className="text-sm">
                               {meal.provider?.providerProfile?.restaurantName ||
                                 "Unknown"}
@@ -246,7 +282,7 @@ export default function AdminMealsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="bg-gray-50">
                             {meal.category?.name || "Uncategorized"}
                           </Badge>
                         </TableCell>
@@ -278,20 +314,21 @@ export default function AdminMealsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <Link href={`/admin/dashboard/meals/edit/${meal.id}`}>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit Meal
                                 </DropdownMenuItem>
                               </Link>
                               <DropdownMenuItem
                                 onClick={() => handleToggleAvailability(meal)}
+                                className="cursor-pointer"
                               >
                                 <Tag className="h-4 w-4 mr-2" />
                                 {meal.isAvailable ? "Disable" : "Enable"}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => openDeleteDialog(meal)}
-                                className="text-red-600"
+                                className="text-red-600 cursor-pointer"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
@@ -305,30 +342,12 @@ export default function AdminMealsPage() {
                 </TableBody>
               </Table>
 
-              {/* Pagination */}
-              <div className="flex items-center justify-between p-4 border-t">
-                <p className="text-sm text-gray-500">
-                  Page {page} of {totalPages}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Next
-                  </Button>
+              {/* Pagination Controls */}
+              {meta && meta.totalPages > 1 && (
+                <div className="p-4 border-t">
+                  <PaginationControls meta={meta} />
                 </div>
-              </div>
+              )}
             </>
           )}
         </CardContent>

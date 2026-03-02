@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Store,
   Search,
@@ -21,7 +21,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,6 +43,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 interface UserFilterOptions {
   limit?: number;
@@ -126,26 +127,52 @@ interface Provider {
   };
 }
 
+interface MetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export default function AdminRestaurantsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [providers, setProviders] = useState<Provider[]>([]);
+  const [meta, setMeta] = useState<MetaData>({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  // Get current page from URL or default to 1
+  const currentPage = Number(searchParams.get("page")) || 1;
+
   useEffect(() => {
     loadProviders();
-  }, []);
+  }, [currentPage]);
 
   const loadProviders = async () => {
     try {
       setLoading(true);
-      const result = await getAllUsers({ limit: 100 });
+      const result = await getAllUsers({ 
+        page: currentPage, 
+        limit: 12,
+        role: "PROVIDER"
+      });
+      
       const onlyProviders = result.data.filter(
-      (u: { role: string }) => u.role === "PROVIDER",
-    ) as Provider[];
+        (u: { role: string }) => u.role === "PROVIDER",
+      ) as Provider[];
+      
       setProviders(onlyProviders);
+      setMeta(result.meta);
+      
+      // Load stats for each provider
       onlyProviders.forEach((provider: Provider) => {
         loadProviderStats(provider.id);
       });
@@ -186,6 +213,7 @@ export default function AdminRestaurantsPage() {
     }
   };
 
+  // Client-side filtering (applied after pagination)
   const filteredProviders = providers.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -203,13 +231,13 @@ export default function AdminRestaurantsPage() {
   });
 
   const stats = {
-    total: providers.length,
+    total: meta.total,
     active: providers.filter((p) => p.status === "ACTIVE").length,
     suspended: providers.filter((p) => p.status === "SUSPENDED").length,
     verified: providers.filter((p) => p.providerProfile?.isVerified).length,
   };
 
-  if (loading) {
+  if (loading && providers.length === 0) {
     return <RestaurantsSkeleton />;
   }
 
@@ -232,13 +260,13 @@ export default function AdminRestaurantsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 bg-orange-100 rounded-lg">
               <Store className="h-5 w-5 text-orange-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">Total</p>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
             </div>
@@ -250,7 +278,7 @@ export default function AdminRestaurantsPage() {
             <div className="p-2 bg-green-100 rounded-lg">
               <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">Active</p>
               <p className="text-2xl font-bold text-green-600">
                 {stats.active}
@@ -264,7 +292,7 @@ export default function AdminRestaurantsPage() {
             <div className="p-2 bg-yellow-100 rounded-lg">
               <ShieldCheck className="h-5 w-5 text-yellow-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">Verified</p>
               <p className="text-2xl font-bold text-yellow-600">
                 {stats.verified}
@@ -278,7 +306,7 @@ export default function AdminRestaurantsPage() {
             <div className="p-2 bg-red-100 rounded-lg">
               <Ban className="h-5 w-5 text-red-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">Suspended</p>
               <p className="text-2xl font-bold text-red-600">
                 {stats.suspended}
@@ -325,10 +353,14 @@ export default function AdminRestaurantsPage() {
           <span className="font-medium text-gray-900">
             {filteredProviders.length}
           </span>{" "}
+          of{" "}
+          <span className="font-medium text-gray-900">
+            {meta.total}
+          </span>{" "}
           restaurants
         </p>
         <Badge variant="outline" className="px-3 py-1">
-          {filteredProviders.length} of {providers.length}
+          Page {meta.page} of {meta.totalPages}
         </Badge>
       </div>
 
@@ -561,8 +593,15 @@ export default function AdminRestaurantsPage() {
         ))}
       </div>
 
+      {/* Pagination */}
+      {meta && meta.totalPages > 1 && (
+        <div className="mt-8">
+          <PaginationControls meta={meta} />
+        </div>
+      )}
+
       {/* Empty State */}
-      {filteredProviders.length === 0 && (
+      {filteredProviders.length === 0 && !loading && (
         <Card>
           <CardContent className="py-12 text-center">
             <Store className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -602,6 +641,8 @@ function RestaurantsSkeleton() {
           <Skeleton key={i} className="h-96" />
         ))}
       </div>
+
+      <Skeleton className="h-16" />
     </div>
   );
 }

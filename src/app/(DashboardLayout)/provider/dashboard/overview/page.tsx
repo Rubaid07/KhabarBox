@@ -90,7 +90,7 @@ function WeeklyChart({ data }: { data: ChartData[] }) {
                     className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg transition-all duration-300 group-hover:from-orange-700 group-hover:to-orange-500 cursor-pointer relative shadow-sm"
                     style={{ 
                       height: `${heightPercentage}%`,
-                      minHeight: '16px', // Increased minimum height
+                      minHeight: '16px',
                       opacity: day.revenue === 0 ? 0.5 : 1
                     }}
                   >
@@ -101,7 +101,6 @@ function WeeklyChart({ data }: { data: ChartData[] }) {
                       <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45" />
                     </div>
 
-                    {/* Value label on bar (for significant values) */}
                     {day.revenue > maxRevenue * 0.1 && (
                       <div className="absolute top-1 left-1/2 -translate-x-1/2 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100">
                         {formatPrice(day.revenue)}
@@ -350,7 +349,7 @@ export default function ProviderOverviewPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <QuickActionCard
-          href="/provider/dashboard/meals/create"
+          href="/provider/dashboard/create-meal"
           icon={ChefHat}
           title="Add New Meal"
           description="Create a new menu item"

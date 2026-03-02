@@ -44,7 +44,6 @@ export default function MyMealsPage() {
   }, []);
 
   useEffect(() => {
-    // Filter meals when search changes
     const filtered = meals.filter(
       (meal) =>
         meal.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

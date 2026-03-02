@@ -6,7 +6,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 interface PaginationControlsProps {
   meta: {
@@ -15,18 +15,27 @@ interface PaginationControlsProps {
     total: number;
     totalPages: number;
   };
+  baseUrl?: string; // অপশনাল: যদি নির্দিষ্ট URL এ পাঠাতে চান
 }
 
-export default function PaginationControls({ meta }: PaginationControlsProps) {
+export default function PaginationControls({ meta, baseUrl }: PaginationControlsProps) {
   const { limit: pageSize, page: currentPage, total, totalPages } = meta;
   const searchParams = useSearchParams();
+  const pathname = usePathname(); // ✅ কারেন্ট পাথ পেতে
   const router = useRouter();
 
   const navigateToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
+    
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.push(`/meals?${params.toString()}`);
+    
+    // ✅ ডাইনামিক URL - বর্তমান পাথে যাবে
+    const url = baseUrl 
+      ? `${baseUrl}?${params.toString()}` 
+      : `${pathname}?${params.toString()}`;
+    
+    router.push(url);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

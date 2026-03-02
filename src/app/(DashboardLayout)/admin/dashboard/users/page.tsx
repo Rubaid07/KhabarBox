@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   MoreHorizontal,
@@ -11,8 +12,6 @@ import {
   XCircle,
   Trash2,
   AlertTriangle,
-  ChevronLeft,
-  ChevronRight,
   RefreshCw,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
@@ -48,10 +47,10 @@ import {
   suspendUser,
   activateUser,
   deleteUser,
-  // User as UserType,
 } from "@/lib/api-admin";
 import { formatDate } from "@/lib/utils";
 import { Roles } from "@/constants/roles";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 type RoleKey = (typeof Roles)[keyof typeof Roles];
 type StatusKey = "ACTIVE" | "SUSPENDED";
@@ -63,6 +62,13 @@ interface UserType {
   role: RoleKey;
   status: StatusKey;
   createdAt: string | Date;
+}
+
+interface MetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 const roleConfig: Record<RoleKey, { icon: LucideIcon; color: string; label: string }> = {
@@ -77,32 +83,36 @@ const statusConfig: Record<StatusKey, { color: string; icon: LucideIcon }> = {
 };
 
 export default function AdminUsersPage() {
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState<UserType[]>([]);
+  const [meta, setMeta] = useState<MetaData>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 
-  const limit = 10;
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   useEffect(() => {
     loadUsers();
-  }, [page]);
+  }, [currentPage]);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
-      // .toString() ব্যবহার করে নাম্বারকে স্ট্রিং করুন
       const result = await getAllUsers({
-        page: page.toString(),
-        limit: limit.toString(),
+        page: currentPage.toString(),
+        limit: "10",
       });
       setUsers(result.data);
-      setTotalPages(result.meta.totalPage);
+      setMeta(result.meta);
     } catch (error) {
       toast.error("Failed to load users");
     } finally {
@@ -368,30 +378,11 @@ export default function AdminUsersPage() {
                 </TableBody>
               </Table>
 
-              {/* Pagination */}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500">
-                  Page {page} of {totalPages}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+              {meta && meta.totalPages > 1 && (
+                <div className="mt-6">
+                  <PaginationControls meta={meta} />
                 </div>
-              </div>
+              )}
             </>
           )}
         </CardContent>

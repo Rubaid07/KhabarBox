@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Plus,
   Search,
@@ -49,10 +50,30 @@ import {
   CreateCategoryInput,
 } from "@/lib/api-categories";
 import { Category } from "@/types/meal";
+import PaginationControls from "@/components/ui/pagination-controls";
+
+interface MetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+interface PaginatedResponse {
+  data: Category[];
+  meta: MetaData;
+}
 
 export default function AdminCategoriesPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [meta, setMeta] = useState<MetaData>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -64,30 +85,47 @@ export default function AdminCategoriesPage() {
     name: "",
   });
 
+  const currentPage = Number(searchParams.get("page")) || 1;
+
   useEffect(() => {
     loadCategories();
-  }, []);
-
-  useEffect(() => {
-    const filtered = categories.filter((cat) =>
-      cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredCategories(filtered);
-  }, [searchQuery, categories]);
+  }, [currentPage]);
 
   const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllCategories();
-      setCategories(data);
-      setFilteredCategories(data);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to load categories";
-      toast.error(message);
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const response = await getAllCategories() as unknown;
+    const isPaginated = (res: unknown): res is PaginatedResponse => {
+      const r = res as PaginatedResponse;
+      return !!(r && r.data && r.meta);
+    };
+
+    if (isPaginated(response)) {
+      setCategories(response.data);
+      setMeta(response.meta);
+    } 
+    else if (Array.isArray(response)) {
+      const dataArray = response as Category[];
+      const total = dataArray.length;
+      const totalPages = Math.ceil(total / 10);
+      const start = (currentPage - 1) * 10;
+      const end = start + 10;
+      
+      setCategories(dataArray.slice(start, end));
+      setMeta({
+        page: currentPage,
+        limit: 10,
+        total: total,
+        totalPages: totalPages,
+      });
     }
-  };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to load categories";
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const resetForm = () => {
     setFormData({ name: "" });
@@ -106,6 +144,10 @@ export default function AdminCategoriesPage() {
       toast.success("Category created successfully");
       setIsCreateOpen(false);
       resetForm();
+      
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.push(`?${params.toString()}`);
       loadCategories();
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Failed to create category";
@@ -165,7 +207,11 @@ export default function AdminCategoriesPage() {
     setIsDeleteOpen(true);
   };
 
-  if (loading) {
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading && categories.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="relative">
@@ -180,16 +226,16 @@ export default function AdminCategoriesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Categories</h1>
           <p className="text-gray-500 mt-1">
-            Manage food categories • <span className="font-semibold text-orange-600">{categories.length}</span> total
+            Manage food categories • <span className="font-semibold text-orange-600">{meta.total}</span> total
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
-
+        <div>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button className="bg-orange-600 hover:bg-orange-700 text-white gap-2">
@@ -239,7 +285,7 @@ export default function AdminCategoriesPage() {
         </div>
       </div>
 
-      {/* Search Bar - কার্ডের ভিতরে */}
+      {/* Search Bar */}
       <Card>
         <CardContent className="p-4">
           <div className="relative">
@@ -267,7 +313,7 @@ export default function AdminCategoriesPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-medium flex items-center gap-2">
             <Tag className="h-5 w-5 text-orange-500" />
-            All Categories ({filteredCategories.length})
+            All Categories
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -356,6 +402,13 @@ export default function AdminCategoriesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPages > 1 && (
+        <div className="mt-4">
+          <PaginationControls meta={meta} />
+        </div>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
