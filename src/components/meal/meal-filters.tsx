@@ -1,15 +1,15 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { 
-  Hash, 
-  Search, 
-  SlidersHorizontal, 
-  X, 
-  Clock, 
-  TrendingUp, 
+import {
+  Hash,
+  Search,
+  SlidersHorizontal,
+  X,
+  Clock,
+  TrendingUp,
   ChevronRight,
-  UtensilsCrossed
+  UtensilsCrossed,
 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { useState, useRef, useEffect } from "react";
@@ -17,8 +17,8 @@ import { getSuggestions, SuggestionResponse } from "@/lib/api-suggestions";
 import { getAllCategories } from "@/lib/api-categories";
 import { Category } from "@/types/meal";
 import Link from "next/link";
+import Image from "next/image";
 
-// Recent searches from localStorage
 const getRecentSearches = (): string[] => {
   if (typeof window === "undefined") return [];
   return JSON.parse(localStorage.getItem("recentSearches") || "[]");
@@ -27,7 +27,7 @@ const getRecentSearches = (): string[] => {
 const addRecentSearch = (term: string) => {
   if (typeof window === "undefined" || !term.trim()) return;
   const recent = getRecentSearches();
-  const updated = [term, ...recent.filter(t => t !== term)].slice(0, 5);
+  const updated = [term, ...recent.filter((t) => t !== term)].slice(0, 5);
   localStorage.setItem("recentSearches", JSON.stringify(updated));
 };
 
@@ -36,17 +36,29 @@ export default function MealFilters() {
   const searchParams = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestions, setSuggestions] = useState<SuggestionResponse>({ meals: [], tags: [] });
+  const [suggestions, setSuggestions] = useState<SuggestionResponse>({
+    meals: [],
+    tags: [],
+    restaurants: [],
+  });
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState(searchParams.get("search") || "");
-  const [tagValue, setTagValue] = useState(searchParams.get("dietaryTags") || "");
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || "",
+  );
+  const [tagValue, setTagValue] = useState(
+    searchParams.get("dietaryTags") || "",
+  );
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("categoryId") || "");
-  
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("categoryId") || "",
+  );
+
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
   // Load categories on mount
   useEffect(() => {
@@ -63,7 +75,6 @@ export default function MealFilters() {
     }
   };
 
-  // Click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -77,7 +88,7 @@ export default function MealFilters() {
   // Fetch suggestions with debounce
   const fetchSuggestions = useDebouncedCallback(async (term: string) => {
     if (term.length < 2) {
-      setSuggestions({ meals: [], tags: [] });
+      setSuggestions({ meals: [], tags: [], restaurants: [] });
       return;
     }
     setIsLoading(true);
@@ -100,16 +111,16 @@ export default function MealFilters() {
 
   const executeSearch = (term: string) => {
     if (!term.trim()) return;
-    
+
     addRecentSearch(term);
     setRecentSearches(getRecentSearches());
     setShowSuggestions(false);
-    
+
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", "1");
     params.set("search", term);
     setSearchValue(term);
-    
+
     router.push(`/meals?${params.toString()}`);
   };
 
@@ -127,32 +138,36 @@ export default function MealFilters() {
     setSelectedCategory(categoryId);
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", "1");
-    
+
     if (categoryId) {
       params.set("categoryId", categoryId);
     } else {
       params.delete("categoryId");
     }
-    
+
     router.push(`/meals?${params.toString()}`);
   };
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const items = [
-      ...recentSearches.map(r => ({ type: "recent" as const, value: r })),
-      ...suggestions.meals.map(m => ({ type: "meal" as const, value: m.name, id: m.id })),
-      ...suggestions.tags.map(t => ({ type: "tag" as const, value: t })),
+      ...recentSearches.map((r) => ({ type: "recent" as const, value: r })),
+      ...suggestions.meals.map((m) => ({
+        type: "meal" as const,
+        value: m.name,
+        id: m.id,
+      })),
+      ...suggestions.tags.map((t) => ({ type: "tag" as const, value: t })),
     ];
 
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setActiveIndex(prev => (prev < items.length - 1 ? prev + 1 : prev));
+        setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev));
         break;
       case "ArrowUp":
         e.preventDefault();
-        setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
       case "Enter":
         e.preventDefault();
@@ -175,7 +190,10 @@ export default function MealFilters() {
     }
   };
 
-  const updateFilters = (updates: Record<string, string | null> | string, value?: string | null) => {
+  const updateFilters = (
+    updates: Record<string, string | null> | string,
+    value?: string | null,
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
     if (typeof updates === "string") {
       if (value) params.set(updates, value);
@@ -197,23 +215,29 @@ export default function MealFilters() {
     searchParams.get("maxPrice") ||
     searchParams.get("dietaryTags");
 
-  // Combine all suggestion items for rendering
+  // all suggestion items
   const allSuggestions = [
-    ...recentSearches.map(r => ({ type: "recent" as const, value: r })),
-    ...suggestions.meals.map(m => ({ type: "meal" as const, value: m.name, id: m.id, image: m.imageUrl })),
-    ...suggestions.tags.map(t => ({ type: "tag" as const, value: t })),
+    ...recentSearches.map((r) => ({ type: "recent" as const, value: r })),
+    ...suggestions.meals.map((m) => ({
+      type: "meal" as const,
+      value: m.name,
+      id: m.id,
+      image: m.imageUrl,
+    })),
+    ...suggestions.tags.map((t) => ({ type: "tag" as const, value: t })),
   ];
 
   // Get selected category name
-  const selectedCategoryName = categories.find(c => c.id === selectedCategory)?.name;
+  const selectedCategoryName = categories.find(
+    (c) => c.id === selectedCategory,
+  )?.name;
 
   return (
     <div className="space-y-4">
-      {/* Category Pills - Quick Filter */}
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         <button
           onClick={() => handleCategoryChange("")}
-          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+          className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
             !selectedCategory
               ? "bg-orange-500 text-white"
               : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
@@ -225,7 +249,7 @@ export default function MealFilters() {
           <button
             key={category.id}
             onClick={() => handleCategoryChange(category.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+            className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
               selectedCategory === category.id
                 ? "bg-orange-500 text-white"
                 : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
@@ -238,7 +262,7 @@ export default function MealFilters() {
         {categories.length > 8 && (
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+            className="shrink-0 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
           >
             +{categories.length - 8} more
           </button>
@@ -247,7 +271,7 @@ export default function MealFilters() {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-          {/* Main Search with Suggestions */}
+          {/* Search with Suggestions */}
           <div className="relative" ref={searchRef}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -260,121 +284,152 @@ export default function MealFilters() {
               onFocus={() => setShowSuggestions(true)}
               onKeyDown={handleKeyDown}
             />
-            
+
             {/* Suggestions Dropdown */}
-            {showSuggestions && (searchValue.length >= 2 || recentSearches.length > 0) && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                {/* Loading State */}
-                {isLoading && (
-                  <div className="p-4 text-center text-gray-500">
-                    <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                    Searching...
-                  </div>
-                )}
-
-                {/* Recent Searches Section */}
-                {!isLoading && recentSearches.length > 0 && searchValue.length < 2 && (
-                  <div className="p-2">
-                    <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                      <Clock className="w-3 h-3" />
-                      Recent Searches
+            {showSuggestions &&
+              (searchValue.length >= 2 || recentSearches.length > 0) && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                  {/* Loading State */}
+                  {isLoading && (
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                      Searching...
                     </div>
-                    {recentSearches.map((term, idx) => (
-                      <button
-                        key={term}
-                        onClick={() => executeSearch(term)}
-                        className={`w-full px-3 py-2 text-left rounded-lg flex items-center gap-3 transition-colors ${
-                          activeIndex === idx ? "bg-orange-50 text-orange-700" : "hover:bg-gray-50"
-                        }`}
-                      >
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="flex-1">{term}</span>
-                        <span className="text-xs text-gray-400">Search</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  )}
 
-                {/* Suggestions Section */}
-                {!isLoading && allSuggestions.filter(s => s.type !== "recent" || searchValue.length >= 2).length > 0 && (
-                  <div className="p-2">
-                    {/* Meals */}
-                    {suggestions.meals.length > 0 && (
-                      <>
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                          Meals
+                  {/* Recent Searches Section */}
+                  {!isLoading &&
+                    recentSearches.length > 0 &&
+                    searchValue.length < 2 && (
+                      <div className="p-2">
+                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                          <Clock className="w-3 h-3" />
+                          Recent Searches
                         </div>
-                        {suggestions.meals.map((meal, idx) => {
-                          const globalIdx = recentSearches.length + idx;
-                          return (
-                            <Link
-                              key={meal.id}
-                              href={`/meals/${meal.id}`}
-                              onClick={() => setShowSuggestions(false)}
-                              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                                activeIndex === globalIdx ? "bg-orange-50" : "hover:bg-gray-50"
-                              }`}
-                            >
-                              {meal.imageUrl ? (
-                                <img src={meal.imageUrl} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                              ) : (
-                                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-lg">
-                                  🍽️
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-900 truncate">{meal.name}</p>
-                                <p className="text-xs text-gray-500">View meal</p>
-                              </div>
-                              <ChevronRight className="w-4 h-4 text-gray-400" />
-                            </Link>
-                          );
-                        })}
-                      </>
+                        {recentSearches.map((term, idx) => (
+                          <button
+                            key={term}
+                            onClick={() => executeSearch(term)}
+                            className={`w-full px-3 py-2 text-left rounded-lg flex items-center gap-3 transition-colors ${
+                              activeIndex === idx
+                                ? "bg-orange-50 text-orange-700"
+                                : "hover:bg-gray-50"
+                            }`}
+                          >
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="flex-1">{term}</span>
+                            <span className="text-xs text-gray-400">
+                              Search
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     )}
 
-                    {/* Tags */}
-                    {suggestions.tags.length > 0 && (
-                      <>
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mt-2">
-                          <TrendingUp className="w-3 h-3" />
-                          Popular Tags
-                        </div>
-                        {suggestions.tags.map((tag, idx) => {
-                          const globalIdx = recentSearches.length + suggestions.meals.length + idx;
-                          return (
-                            <button
-                              key={tag}
-                              onClick={() => executeTagSearch(tag)}
-                              className={`w-full px-3 py-2 text-left rounded-lg flex items-center gap-3 transition-colors ${
-                                activeIndex === globalIdx ? "bg-orange-50 text-orange-700" : "hover:bg-gray-50"
-                              }`}
-                            >
-                              <Hash className="w-4 h-4 text-orange-500" />
-                              <span className="capitalize">{tag}</span>
-                              <span className="text-xs text-gray-400 ml-auto">Filter by tag</span>
-                            </button>
-                          );
-                        })}
-                      </>
-                    )}
-                  </div>
-                )}
+                  {/* Suggestions Section */}
+                  {!isLoading &&
+                    allSuggestions.filter(
+                      (s) => s.type !== "recent" || searchValue.length >= 2,
+                    ).length > 0 && (
+                      <div className="p-2">
+                        {/* Meals */}
+                        {suggestions.meals.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              Meals
+                            </div>
+                            {suggestions.meals.map((meal, idx) => {
+                              const globalIdx = recentSearches.length + idx;
+                              return (
+                                <Link
+                                  key={meal.id}
+                                  href={`/meals/${meal.id}`}
+                                  onClick={() => setShowSuggestions(false)}
+                                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                                    activeIndex === globalIdx
+                                      ? "bg-orange-50"
+                                      : "hover:bg-gray-50"
+                                  }`}
+                                >
+                                  {meal.imageUrl ? (
+                                    <Image
+                                      src={meal.imageUrl}
+                                      alt={meal.name || "Meal Image"}
+                                      fill
+                                      className="rounded-lg object-cover"
+                                      sizes="40px"
+                                    />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-lg">
+                                      🍽️
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-gray-900 truncate">
+                                      {meal.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      View meal
+                                    </p>
+                                  </div>
+                                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                                </Link>
+                              );
+                            })}
+                          </>
+                        )}
 
-                {/* No Results */}
-                {!isLoading && searchValue.length >= 2 && allSuggestions.length === 0 && (
-                  <div className="p-4 text-center text-gray-500">
-                    <p>No results found for &quot;{searchValue}&quot;</p>
-                    <button
-                      onClick={() => executeSearch(searchValue)}
-                      className="mt-2 text-orange-600 hover:underline"
-                    >
-                      Search anyway
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+                        {/* Tags */}
+                        {suggestions.tags.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mt-2">
+                              <TrendingUp className="w-3 h-3" />
+                              Popular Tags
+                            </div>
+                            {suggestions.tags.map((tag, idx) => {
+                              const globalIdx =
+                                recentSearches.length +
+                                suggestions.meals.length +
+                                idx;
+                              return (
+                                <button
+                                  key={tag}
+                                  onClick={() => executeTagSearch(tag)}
+                                  className={`w-full px-3 py-2 text-left rounded-lg flex items-center gap-3 transition-colors ${
+                                    activeIndex === globalIdx
+                                      ? "bg-orange-50 text-orange-700"
+                                      : "hover:bg-gray-50"
+                                  }`}
+                                >
+                                  <Hash className="w-4 h-4 text-orange-500" />
+                                  <span className="capitalize">{tag}</span>
+                                  <span className="text-xs text-gray-400 ml-auto">
+                                    Filter by tag
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                  {/* No Results */}
+                  {!isLoading &&
+                    searchValue.length >= 2 &&
+                    allSuggestions.length === 0 && (
+                      <div className="p-4 text-center text-gray-500">
+                        <p>No results found for &quot;{searchValue}&quot;</p>
+                        <button
+                          onClick={() => executeSearch(searchValue)}
+                          className="mt-2 text-orange-600 hover:underline"
+                        >
+                          Search anyway
+                        </button>
+                      </div>
+                    )}
+                </div>
+              )}
           </div>
 
           {/* Tag Search */}
@@ -418,6 +473,8 @@ export default function MealFilters() {
                 setSearchValue("");
                 setTagValue("");
                 setSelectedCategory("");
+                setMinPrice("");
+                setMaxPrice("");
               }}
               className="px-4 py-3 text-gray-500 hover:text-red-500 font-medium transition-colors"
               title="Clear all filters"
@@ -476,17 +533,28 @@ export default function MealFilters() {
                 type="number"
                 placeholder="Min"
                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-                defaultValue={searchParams.get("minPrice") || ""}
-                onBlur={(e) => updateFilters("minPrice", e.target.value)}
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
               />
               <span className="text-gray-400">-</span>
               <input
                 type="number"
                 placeholder="Max"
                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-                defaultValue={searchParams.get("maxPrice") || ""}
-                onBlur={(e) => updateFilters("maxPrice", e.target.value)}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
               />
+              <button
+                onClick={() =>
+                  updateFilters({
+                    minPrice: minPrice || null,
+                    maxPrice: maxPrice || null,
+                  })
+                }
+                className="ml-2 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors shadow-sm"
+              >
+                Apply
+              </button>
             </div>
           </div>
 

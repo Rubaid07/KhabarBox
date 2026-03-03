@@ -441,7 +441,7 @@ function StatCard({
             </p>
             <div className="flex items-center gap-1 mt-1 sm:mt-2">
               {trend === "up" && (
-                <TrendingUp className="h-3 w-3 text-emerald-600 flex-shrink-0" />
+                <TrendingUp className="h-3 w-3 text-emerald-600 shrink-0" />
               )}
               <p
                 className={`text-xs truncate ${highlight ? "text-amber-600" : "text-gray-400"}`}
@@ -458,7 +458,7 @@ function StatCard({
               </Link>
             )}
           </div>
-          <div className="p-1.5 sm:p-2 bg-gray-50 rounded-lg ml-2 flex-shrink-0">
+          <div className="p-1.5 sm:p-2 bg-gray-50 rounded-lg ml-2 shrink-0">
             <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
           </div>
         </div>

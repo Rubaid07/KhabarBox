@@ -83,7 +83,7 @@ export default function AdminMealsPage() {
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  
+
   // Get current page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
 
@@ -94,22 +94,22 @@ export default function AdminMealsPage() {
   const loadMeals = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${API_URL}/meals?page=${currentPage}&limit=10`,
-        { credentials: "include" }
-      );
+      const res = await fetch(`${API_URL}/meals?page=${currentPage}&limit=10`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Failed to fetch meals");
       const result = await res.json();
-      
+
       // Handle different API response structures
       const mealsData = result.data || result.meals || result;
-      const metaData = result.metaData || result.meta || {
-        page: currentPage,
-        limit: 10,
-        total: mealsData.length,
-        totalPages: Math.ceil(mealsData.length / 10)
-      };
-      
+      const metaData = result.metaData ||
+        result.meta || {
+          page: currentPage,
+          limit: 10,
+          total: mealsData.length,
+          totalPages: Math.ceil(mealsData.length / 10),
+        };
+
       setMeals(mealsData);
       setMeta(metaData);
     } catch (error) {
@@ -158,12 +158,13 @@ export default function AdminMealsPage() {
   };
 
   // Filter meals client-side
-  const filteredMeals = meals.filter((m) =>
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.provider?.providerProfile?.restaurantName
-      ?.toLowerCase()
-      .includes(searchQuery.toLowerCase()) ||
-    m.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMeals = meals.filter(
+    (m) =>
+      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.provider?.providerProfile?.restaurantName
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      m.category?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -172,9 +173,16 @@ export default function AdminMealsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">All Meals</h1>
-          <p className="text-gray-500 mt-1">Manage all meals from all restaurants</p>
+          <p className="text-gray-500 mt-1">
+            Manage all meals from all restaurants
+          </p>
         </div>
-        <Button onClick={loadMeals} variant="outline" size="sm" className="gap-2">
+        <Button
+          onClick={loadMeals}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -198,9 +206,7 @@ export default function AdminMealsPage() {
       {/* Meals Table */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            All Meals
-          </CardTitle>
+          <CardTitle>All Meals</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -235,7 +241,7 @@ export default function AdminMealsPage() {
                       <TableRow key={meal.id} className="hover:bg-gray-50">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="relative h-10 w-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                            <div className="relative h-10 w-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                               {meal.imageUrl ? (
                                 <Image
                                   src={meal.imageUrl}
@@ -274,7 +280,7 @@ export default function AdminMealsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Store className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                            <Store className="h-4 w-4 text-gray-400 shrink-0" />
                             <span className="text-sm">
                               {meal.provider?.providerProfile?.restaurantName ||
                                 "Unknown"}
@@ -313,7 +319,9 @@ export default function AdminMealsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <Link href={`/admin/dashboard/meals/edit/${meal.id}`}>
+                              <Link
+                                href={`/admin/dashboard/meals/edit/${meal.id}`}
+                              >
                                 <DropdownMenuItem className="cursor-pointer">
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit Meal

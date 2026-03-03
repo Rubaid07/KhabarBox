@@ -3,6 +3,7 @@
 import { AnimatedList } from "@/components/ui/animated-list"
 import { cn } from "@/lib/utils"
 import { Star } from "lucide-react"
+import Image from "next/image"
 
 interface Restaurant {
   name: string
@@ -55,19 +56,20 @@ const RestaurantNotification = ({ name, cuisine, rating, orders, image }: Restau
     <figure
       className={cn(
         "relative w-full cursor-pointer overflow-hidden rounded-2xl p-4",
-        "border border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+        "border border-gray-950/10 bg-gray-950/1 hover:bg-gray-950/5",
         "transition-all duration-200 ease-in-out hover:scale-[1.02]",
         "shadow-sm hover:shadow-md"
       )}
     >
       <div className="flex flex-row items-center gap-3">
         {/* Restaurant Image */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden ring-2 ring-gray-100">
-          <img 
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl ring-2 ring-gray-100">
+          <Image 
             src={image} 
             alt={name}
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
+            sizes="48px"
           />
         </div>
 
@@ -100,7 +102,7 @@ export function TopRestaurantsDemo({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative flex max-h-[260px] min-h-[260px] w-full flex-col overflow-hidden",
+        "relative flex max-h-65 min-h-65 w-full flex-col overflow-hidden",
         className
       )}
     >

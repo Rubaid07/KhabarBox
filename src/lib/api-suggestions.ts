@@ -1,6 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-// ✅ Updated interface matching backend
 export interface SuggestionResponse {
   meals: Array<{
     id: string;

@@ -172,7 +172,7 @@ function TopRatedCard({
         {rank}
       </div>
 
-      <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border-2 border-white shadow">
+      <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0 border-2 border-white shadow">
         <Image
           src={imageUrl}
           alt={restaurant.restaurantName}

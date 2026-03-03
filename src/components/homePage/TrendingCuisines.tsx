@@ -5,6 +5,7 @@ import { getTrendingCategories } from "@/lib/api-categories";
 import { Category } from "@/types/meal";
 import { ChevronLeft, ChevronRight, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const cuisineImages: Record<string, string> = {
   italian: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=400",
@@ -186,20 +187,21 @@ export default function TrendingCuisines() {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href={`/meals?categoryId=${category.id}`} // Redirect to meals with filter
-                className="flex-shrink-0 group"
+                href={`/meals?categoryId=${category.id}`}
+                className="shrink-0 group"
                 style={{
                   width: `calc(${100 / itemsPerView}% - ${((itemsPerView - 1) * 16) / itemsPerView}px)`,
                 }}
               >
-                <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200">
+                <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-gray-200">
                   {/* Image */}
-                  <img
+                  <Image
                     src={getCuisineImage(category.name)}
                     alt={category.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 15vw"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 

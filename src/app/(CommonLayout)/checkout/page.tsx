@@ -102,7 +102,8 @@ export default function CheckoutPage() {
         router.push("/orders");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to place order";
+      const message =
+        error instanceof Error ? error.message : "Failed to place order";
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -279,7 +280,7 @@ export default function CheckoutPage() {
                 <div className="space-y-4 max-h-64 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                         {item.meal.imageUrl ? (
                           <Image
                             src={item.meal.imageUrl}

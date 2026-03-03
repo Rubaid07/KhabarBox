@@ -14,13 +14,10 @@ import {
   BadgeCheck,
   ChevronLeft,
   Search,
-  ShoppingCart,
   Mail,
   Clock3,
   UtensilsCrossed,
   Info,
-  Plus,
-  Minus,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -131,12 +128,15 @@ export default function RestaurantProfilePage() {
           <div className="lg:container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-8">
             <div className="flex items-end gap-4 md:gap-6">
               {/* Logo */}
-              <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full shadow-2xl flex items-center justify-center overflow-hidden border-4 border-white shrink-0">
+              <div className="relative w-24 h-24 md:w-32 md:h-32 bg-white rounded-full shadow-2xl flex items-center justify-center overflow-hidden border-4 border-white shrink-0">
                 {restaurant.logoUrl || restaurant.user?.image ? (
-                  <img
-                    src={restaurant.logoUrl || restaurant.user?.image}
+                  <Image
+                    src={(restaurant.logoUrl || restaurant.user?.image) ?? ""}
                     alt={restaurant.restaurantName}
-                    className="w-full h-full object-cover"
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 96px, 128px"
                   />
                 ) : (
                   <span className="text-4xl md:text-5xl">🏪</span>

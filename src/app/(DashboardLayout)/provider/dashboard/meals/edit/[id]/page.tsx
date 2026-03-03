@@ -7,6 +7,7 @@ import { Meal, Category } from "@/types/meal";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, Save, Plus, X, Check } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const DIETARY_OPTIONS = [
   "vegetarian",
@@ -30,8 +31,8 @@ export default function EditMealPage() {
   const mealId = params.id as string;
 
   const basePath = useMemo(() => {
-    return pathname.startsWith("/admin") 
-      ? "/admin/dashboard/meals" 
+    return pathname.startsWith("/admin")
+      ? "/admin/dashboard/meals"
       : "/provider/dashboard/meals";
   }, [pathname]);
 
@@ -323,28 +324,31 @@ export default function EditMealPage() {
               </h2>
 
               {formData.imageUrl ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
-                  <img
+                <div className="relative aspect-video rounded-lg overflow-hidden mb-4 border border-gray-100">
+                  <Image
+                    key={formData.imageUrl}
                     src={formData.imageUrl}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={() =>
-                      setFormData((prev) => ({ ...prev, imageUrl: "" }))
-                    }
+                    alt="Meal Preview"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 300px"
                   />
                   <button
                     type="button"
                     onClick={() =>
                       setFormData((prev) => ({ ...prev, imageUrl: "" }))
                     }
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg z-10"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center mb-4">
+                <div className="aspect-video rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center mb-4 gap-2">
                   <span className="text-4xl">🍽️</span>
+                  <span className="text-sm text-gray-400">
+                    No image provided
+                  </span>
                 </div>
               )}
 

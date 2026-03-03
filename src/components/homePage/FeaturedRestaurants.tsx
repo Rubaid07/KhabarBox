@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function FeaturedRestaurants() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -133,11 +134,14 @@ export default function FeaturedRestaurants() {
 
                   {/* Rounded Restaurant Logo */}
                   <div className="relative z-10">
-                    <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-white group-hover:scale-105 transition-transform duration-300">
-                      <img
-                        src={imageUrl}
+                    <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-white group-hover:scale-105 transition-transform duration-300">
+                      <Image
+                        src={imageUrl || "/placeholder-restaurant.png"}
                         alt={restaurant.restaurantName}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="112px"
+                        className="object-cover"
+                        priority={index < 3}
                       />
                     </div>
                   </div>
