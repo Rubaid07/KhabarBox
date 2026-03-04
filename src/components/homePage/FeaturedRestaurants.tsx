@@ -158,7 +158,7 @@ export default function FeaturedRestaurants() {
                 <div className="p-5">
                   {/* Rating Badge */}
                   <div className="flex items-center justify-center -mt-8 mb-4 ">
-                    <div className="flex items-center gap-1 px-4 py-2 bg-white rounded-full shadow-lg border border-orange-100 z-50">
+                    <div className="flex items-center gap-1 px-4 py-2 bg-white rounded-full shadow-lg border border-orange-100 z-10">
                       <Star className="w-5 h-5 text-orange-500 fill-orange-500" />
                       <div className="font-bold text-gray-900 text-lg">
                         {rating > 0 ? rating.toFixed(1) : "N/A"}
