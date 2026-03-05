@@ -80,9 +80,9 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await authClient.signIn.social({
-        provider: "google",
-        callbackURL: process.env.FRONTEND_URL || "http://localhost:3000",
-      });
+      provider: "google",
+      callbackURL: typeof window !== "undefined" ? window.location.origin : "/",
+    });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Google login failed";
       toast.error(errorMessage);
