@@ -81,7 +81,7 @@ export function LoginForm() {
     try {
       await authClient.signIn.social({
       provider: "google",
-      callbackURL: typeof window !== "undefined" ? window.location.origin : "/",
+      callbackURL: "https://khabarbox.vercel.app",
     });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Google login failed";
