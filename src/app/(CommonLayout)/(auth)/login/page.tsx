@@ -20,19 +20,17 @@ function LoginContent() {
 
       <p className="mt-8 text-center text-sm text-muted-foreground">
         By signing in, you agree to our{" "}
-        <Link
-          href="/terms"
-          className="underline underline-offset-4 hover:text-primary"
+        <button
+          className="underline underline-offset-4 hover:text-primary cursor-pointer"
         >
           Terms of Service
-        </Link>{" "}
+        </button>{" "}
         and{" "}
-        <Link
-          href="/privacy"
-          className="underline underline-offset-4 hover:text-primary"
+        <button
+          className="underline underline-offset-4 hover:text-primary cursor-pointer"
         >
           Privacy Policy
-        </Link>
+        </button>
       </p>
     </div>
   );
