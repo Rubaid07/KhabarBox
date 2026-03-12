@@ -83,12 +83,12 @@ export default function PopularMeals({ onAddToCart }: PopularMealsProps) {
             <div className="flex items-center gap-2 mb-2">
               <Flame className="w-6 h-6 text-orange-500" />
               <span className="text-orange-500 font-semibold text-sm uppercase tracking-wide">
-                Most Ordered
+                Discover Our Menu
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">Popular Meals</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Today&apos;s Specials</h2>
             <p className="text-gray-600 mt-2">
-              Delicious dishes loved by our customers
+              Explore our delicious selection of handcrafted meals
             </p>
           </div>
 
