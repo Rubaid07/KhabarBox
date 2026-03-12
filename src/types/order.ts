@@ -8,6 +8,22 @@ export interface CreateOrderInput {
   notes?: string;
 }
 
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  price: number | string;
+  meal: {
+    id: string;
+    name: string;
+    imageUrl?: string;
+    provider?: {
+      providerProfile?: {
+        restaurantName: string;
+      };
+    };
+  };
+}
+
 export interface Order {
   id: string;
   customerId: string;
@@ -35,7 +51,7 @@ export interface Order {
       };
     };
   }>;
-  items?: Array<any>;
+  items?: OrderItem[];
   customer?: {
     id: string;
     name: string;

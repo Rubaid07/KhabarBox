@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
 export default function SuspendedPage() {
-  // ✅ Move handleLogout before useEffect
   const handleLogout = useCallback(async () => {
     await authClient.signOut();
     window.location.href = "/login?suspended=true";
@@ -17,7 +16,7 @@ export default function SuspendedPage() {
       handleLogout();
     }, 3000);
     return () => clearTimeout(timer);
-  }, [handleLogout]); // ✅ Add handleLogout to dependency
+  }, [handleLogout]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

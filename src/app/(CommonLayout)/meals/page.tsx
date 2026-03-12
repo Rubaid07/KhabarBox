@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getAllMeals } from "@/lib/api-meals";
 import { Meal } from "@/types/meal";
 import PaginationControls from "@/components/ui/pagination-controls";
@@ -33,7 +34,7 @@ export default async function AllMealsPage({ searchParams }: MealsPageProps) {
       {/* Header Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="lg:container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Breadcrumb */}
+      
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
             <Link href="/" className="hover:text-orange-600 transition-colors">
               Home

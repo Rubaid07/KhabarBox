@@ -48,7 +48,6 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
 

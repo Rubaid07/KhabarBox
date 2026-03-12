@@ -160,7 +160,6 @@ export default function MealForm() {
     <form onSubmit={handleSubmit} className="">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-        
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <UtensilsCrossed className="w-5 h-5 text-orange-600" />
@@ -168,10 +167,9 @@ export default function MealForm() {
             </h2>
 
             <div className="space-y-4">
-            
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Meal Name 
+                  Meal Name
                 </label>
                 <input
                   type="text"
@@ -219,7 +217,7 @@ export default function MealForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category 
+                    Category
                   </label>
                   <select
                     name="categoryId"
@@ -326,20 +324,20 @@ export default function MealForm() {
               {imagePreview ? (
                 <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
                   <Image
-      src={imagePreview}
-      alt="Preview"
-      fill 
-      className="object-cover"
-      unoptimized 
-    />
-    <button
-      type="button"
-      onClick={() => {
-        setImagePreview("");
-        setFormData((prev) => ({ ...prev, imageUrl: "" }));
-      }}
-      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all z-10"
-    >
+                    src={imagePreview}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImagePreview("");
+                      setFormData((prev) => ({ ...prev, imageUrl: "" }));
+                    }}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all z-10"
+                  >
                     <X className="w-4 h-4" />
                   </button>
                 </div>

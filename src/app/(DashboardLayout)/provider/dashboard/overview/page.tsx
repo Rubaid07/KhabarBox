@@ -52,9 +52,7 @@ function WeeklyChart({ data }: { data: ChartData[] }) {
 
   return (
     <div className="space-y-6">
-      {/* Chart Container - Increased height */}
       <div className="relative h-64">
-        {/* Y-axis labels (visual only) */}
         <div className="absolute -left-2 top-0 h-full flex flex-col justify-between text-xs text-gray-400">
           <span>{formatPrice(maxRevenue)}</span>
           <span>{formatPrice(maxRevenue * 0.75)}</span>
@@ -76,14 +74,13 @@ function WeeklyChart({ data }: { data: ChartData[] }) {
         <div className="relative h-full flex items-end justify-around gap-2 ml-8">
           {data.map((day, idx) => {
             const heightPercentage =
-              day.revenue > 0 ? (day.revenue / maxRevenue) * 100 : 4; // Minimum 4% height for visibility
+              day.revenue > 0 ? (day.revenue / maxRevenue) * 100 : 4;
 
             return (
               <div
                 key={day.day || idx}
                 className="flex-1 flex flex-col items-center gap-2 group"
               >
-                {/* Bar with gradient and animation */}
                 <div className="relative w-full h-full flex items-end">
                   <div
                     className="w-full bg-linear-to-t from-orange-600 to-orange-400 rounded-t-lg transition-all duration-300 group-hover:from-orange-700 group-hover:to-orange-500 cursor-pointer relative shadow-sm"
@@ -112,7 +109,6 @@ function WeeklyChart({ data }: { data: ChartData[] }) {
                   </div>
                 </div>
 
-                {/* Day label with order count */}
                 <div className="text-center">
                   <span className="text-sm font-medium text-gray-700">
                     {day.day}

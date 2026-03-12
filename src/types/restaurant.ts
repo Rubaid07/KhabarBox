@@ -1,4 +1,3 @@
-// types/restaurant.ts
 export interface Restaurant {
   id: string;
   userId: string;

@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "/api/main";
 
 export interface SuggestionResponse {
   meals: Array<{
@@ -20,14 +20,12 @@ export interface SuggestionResponse {
   }>;
 }
 
-// Simple in-memory cache
 const cache = new Map<string, { data: SuggestionResponse; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const getSuggestions = async (query: string): Promise<SuggestionResponse> => {
   if (!query || query.length < 2) return { meals: [], tags: [], restaurants: [] };
   
-  // Check cache
   const cached = cache.get(query);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;

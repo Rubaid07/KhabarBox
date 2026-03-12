@@ -12,7 +12,6 @@ import {
 export function SuspendedModal({ countdown }: { countdown: number }) {
   return (
     <Dialog open={true}>
-      {/* [&>button]:hidden দিয়ে shadcn এর ক্লোজ বাটন হাইড করা হয়েছে */}
       <DialogContent className="sm:max-w-md [&>button]:hidden" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">

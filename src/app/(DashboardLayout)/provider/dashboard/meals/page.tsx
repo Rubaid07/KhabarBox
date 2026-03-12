@@ -35,7 +35,6 @@ export default function MyMealsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
-  // Shadcn Dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 

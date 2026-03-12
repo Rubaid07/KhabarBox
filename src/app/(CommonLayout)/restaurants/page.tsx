@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import {
   getAllRestaurants,
   getTopRatedRestaurants,
@@ -77,7 +78,7 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
       href={`/restaurants/${restaurant.userId}`}
       className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
     >
-      {/* Cover Image Section */}
+      {/* Cover Image */}
       <div className="relative h-40 bg-linear-to-br from-orange-50 to-red-50 overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200 rounded-full -translate-y-1/2 translate-x-1/2" />

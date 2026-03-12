@@ -147,7 +147,7 @@ export default function CheckoutPage() {
       {/* Main Content */}
       <div className="lg:container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Form */}
+          {/* Left Column  */}
           <div className="lg:col-span-2 space-y-6">
             {/* Delivery Details */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                {/* Submit Button - Mobile Only */}
+                {/* Submit Button  */}
                 <div className="lg:hidden">
                   <button
                     type="submit"
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Right Column - Order Summary */}
+          {/* Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
               {/* Order Items */}
@@ -337,7 +337,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Delivery Estimate */}
               <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
                 <div className="flex items-center gap-3">
                   <Clock className="w-5 h-5 text-orange-500" />
@@ -350,7 +349,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Place Order Button - Desktop */}
+              {/* Place Order Button */}
               <button
                 onClick={handleSubmit}
                 disabled={submitting}

@@ -41,16 +41,14 @@ export default function CartPage() {
       try {
         const { data: session } = await authClient.getSession();
 
-        // টাইপ কাস্টিং করে role চেক
         const user = session?.user as unknown as UserData;
 
         if (!user || user.role !== Roles.customer) {
           toast.error("Only customers can access the cart.");
-          router.replace("/"); // রিডাইরেক্ট
+          router.replace("/");
           return;
         }
 
-        // কাস্টমার হলে কার্ট লোড করো
         await loadCart();
       } catch (error) {
         console.error("Auth check failed", error);
@@ -210,10 +208,10 @@ export default function CartPage() {
                   <div className="divide-y divide-gray-100">
                     {restaurantItems.map((item) => (
                       <div key={item.id} className="group">
-                        {/* Main Row - Clickable */}
+                        {/* Main Row */}
                         <Link
                           href={`/meals/${item.meal.id}`}
-                          className="p-6 flex gap-4 hover:bg-gray-50 transition-colors block"
+                          className="p-6 flex gap-4 hover:bg-gray-50 transition-colors"
                         >
                           {/* Image */}
                           <div className="w-24 h-24 shrink-0 bg-gray-100 rounded-xl overflow-hidden relative">

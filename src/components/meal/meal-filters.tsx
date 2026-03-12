@@ -87,7 +87,7 @@ export default function MealFilters() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch suggestions with debounce
+  // Fetch suggestions
   const fetchSuggestions = useDebouncedCallback(async (term: string) => {
     if (term.length < 2) {
       setSuggestions({ meals: [], tags: [], restaurants: [] });
@@ -506,7 +506,7 @@ export default function MealFilters() {
 
       {showAdvanced && (
         <div className="pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-2">
-          {/* Category Dropdown (if not selected from pills) */}
+          {/* Category Dropdown */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Cuisine Type

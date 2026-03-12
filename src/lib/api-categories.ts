@@ -1,6 +1,6 @@
 import { Category } from "@/types/meal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "/api/main";
 
 export interface CreateCategoryInput {
   name: string;
@@ -40,7 +40,6 @@ export const getAllCategories = async (params?: PaginationParams): Promise<Categ
 
   const result = await response.json();
   
-  // যদি পেজিনেটেড রেসপন্স হয়
   if (result.meta) {
     return {
       data: result.data,
@@ -48,11 +47,9 @@ export const getAllCategories = async (params?: PaginationParams): Promise<Categ
     };
   }
   
-  // যদি সাধারণ অ্যারে হয়
   return result.success ? result.data : [];
 };
 
-// অন্যান্য ফাংশন অপরিবর্তিত থাকবে
 export const getTrendingCategories = async (limit: number = 10): Promise<Category[]> => {
   const response = await fetch(`${API_URL}/categories?limit=${limit}`);
   

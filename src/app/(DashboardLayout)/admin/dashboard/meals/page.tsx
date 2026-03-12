@@ -80,7 +80,7 @@ export default function AdminMealsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = "/api/main";
 
   const currentPage = Number(searchParams.get("page")) || 1;
 

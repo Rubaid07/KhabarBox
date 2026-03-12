@@ -110,7 +110,7 @@ export default function PopularMeals({ onAddToCart }: PopularMealsProps) {
               className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 block"
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              {/* Image Container - Fixed aspect ratio */}
+              {/* Image Container */}
               <div className="relative aspect-4/3 bg-gray-100 overflow-hidden">
                 {meal.imageUrl ? (
                   <Image
@@ -128,12 +128,6 @@ export default function PopularMeals({ onAddToCart }: PopularMealsProps) {
 
                 {/* Badges - Top Left */}
                 <div className="absolute top-3 left-3 flex flex-col gap-2">
-                  {index < 3 && (
-                    <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
-                      <Flame className="w-3 h-3" />
-                      HOT
-                    </span>
-                  )}
                   {!meal.isAvailable && (
                     <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
                       SOLD OUT

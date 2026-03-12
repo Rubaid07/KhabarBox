@@ -1,6 +1,18 @@
-import { CreateMealInput, Meal, MealFilterParams, UpdateMealInput } from "@/types/meal";
+import {
+  CreateMealInput,
+  Meal,
+  MealFilterParams,
+  UpdateMealInput,
+} from "@/types/meal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const getBaseUrl = () => {
+  if (typeof window === "undefined") {
+    return process.env.BACKEND_URL || "https://khabarbox-backend.vercel.app";
+  }
+  return "/api/main";
+};
+
+const API_URL = getBaseUrl();
 
 const getToken = () => {
   if (typeof window !== "undefined") {
@@ -12,10 +24,10 @@ const getToken = () => {
 // Get providers meals
 export const getProviderMeals = async (): Promise<Meal[]> => {
   const token = getToken();
-  
+
   const response = await fetch(`${API_URL}/provider/dashboard/meals`, {
     headers: {
-      "Authorization": token ? `Bearer ${token}` : "",
+      Authorization: token ? `Bearer ${token}` : "",
     },
     credentials: "include",
   });
@@ -32,23 +44,23 @@ export const getProviderMeals = async (): Promise<Meal[]> => {
 // Get single meal
 export const getMealById = async (id: string): Promise<Meal> => {
   const response = await fetch(`${API_URL}/meals/${id}`);
-  
+
   if (!response.ok) {
     throw new Error("Failed to fetch meal");
   }
-  
+
   return response.json();
 };
 
 // Create meal
 export const createMeal = async (mealData: CreateMealInput): Promise<Meal> => {
   const token = getToken();
-  
+
   const response = await fetch(`${API_URL}/meals`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": token ? `Bearer ${token}` : "",
+      Authorization: token ? `Bearer ${token}` : "",
     },
     credentials: "include",
     body: JSON.stringify(mealData),
@@ -63,14 +75,17 @@ export const createMeal = async (mealData: CreateMealInput): Promise<Meal> => {
 };
 
 // Update meal
-export const updateMeal = async (id: string, mealData: UpdateMealInput): Promise<Meal> => {
+export const updateMeal = async (
+  id: string,
+  mealData: UpdateMealInput,
+): Promise<Meal> => {
   const token = getToken();
-  
+
   const response = await fetch(`${API_URL}/meals/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": token ? `Bearer ${token}` : "",
+      Authorization: token ? `Bearer ${token}` : "",
     },
     credentials: "include",
     body: JSON.stringify(mealData),
@@ -87,11 +102,11 @@ export const updateMeal = async (id: string, mealData: UpdateMealInput): Promise
 // Delete meal
 export const deleteMeal = async (id: string): Promise<void> => {
   const token = getToken();
-  
+
   const response = await fetch(`${API_URL}/meals/${id}`, {
     method: "DELETE",
     headers: {
-      "Authorization": token ? `Bearer ${token}` : "",
+      Authorization: token ? `Bearer ${token}` : "",
     },
     credentials: "include",
   });
@@ -105,20 +120,20 @@ export const deleteMeal = async (id: string): Promise<void> => {
 // Get categories
 export const getCategories = async () => {
   const response = await fetch(`${API_URL}/categories`);
-  
+
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
-  
+
   return response.json();
 };
 
 // popular meals
 export const getPopularMeals = async (limit: number = 8): Promise<Meal[]> => {
   const response = await fetch(
-    `${API_URL}/meals?sortBy=createdAt&sortOrder=desc&limit=${limit}&isAvailable=true`
+    `${API_URL}/meals?sortBy=createdAt&sortOrder=desc&limit=${limit}&isAvailable=true`,
   );
-  
+
   if (!response.ok) {
     throw new Error("Failed to fetch popular meals");
   }
@@ -154,8 +169,7 @@ export const getAllMeals = async (filters: MealFilterParams) => {
     query.set("isAvailable", filters.isAvailable.toString());
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  const url = `${baseUrl}/meals?${query.toString()}`;
+  const url = `${API_URL}/meals?${query.toString()}`;
 
   const res = await fetch(url, {
     cache: "no-store",

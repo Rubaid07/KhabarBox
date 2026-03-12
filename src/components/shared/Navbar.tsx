@@ -39,9 +39,8 @@ import { authClient } from "@/lib/auth-client";
 import { useCart } from "@/hooks/useCart";
 import { SearchBar } from "../search/search-bar";
 
-// Define which roles can see which nav items
 const navItems = [
-  { label: "Home", href: "/", roles: ["*"] }, // * means all roles
+  { label: "Home", href: "/", roles: ["*"] }, 
   { label: "Meal", href: "/meals", roles: ["*"] },
   { label: "Restaurants", href: "/restaurants", roles: ["*"] },
   { label: "Orders", href: "/orders", roles: [Roles.customer] }, // Only customers
@@ -171,13 +170,11 @@ export default function Navbar() {
   // Filter nav items based on user role
   const getFilteredNavItems = () => {
     if (!user) {
-      // For non-logged in users, show items that are public or for customers
       return navItems.filter(item => 
         item.roles.includes("*") || item.roles.includes(Roles.customer)
       );
     }
     
-    // For logged in users, show items based on their role
     return navItems.filter(item => 
       item.roles.includes("*") || item.roles.includes(user.role)
     );
@@ -191,9 +188,6 @@ export default function Navbar() {
       setIsSearchOpen(false);
     }
   };
-
-  // Check if user can access orders page (for conditional rendering)
-  const canAccessOrders = user?.role === Roles.customer;
 
   if (isLoading) {
     return (
@@ -318,7 +312,7 @@ export default function Navbar() {
                 <Search className="h-5 w-5" />
               </Button>
 
-              {/* Cart Button - Only visible to customers */}
+              {/* Cart Button */}
               {user?.role === Roles.customer && (
                 <Button
                   variant="ghost"
@@ -337,7 +331,6 @@ export default function Navbar() {
                 </Button>
               )}
 
-              {/* Show disabled cart for non-customers */}
               {user && user.role !== Roles.customer && (
                 <Button
                   variant="ghost"
@@ -441,9 +434,9 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Search Panel */}
+      {/* Mobile Search */}
       <div
-        className={`fixed inset-x-0 top-0 z-[60] bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-x-0 top-0 z-60 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden ${
           isSearchOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >

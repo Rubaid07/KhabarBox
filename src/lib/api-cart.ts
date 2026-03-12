@@ -1,6 +1,6 @@
 import { CartResponse, AddToCartInput } from "@/types/cart";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "/api/main";
 
 const getToken = () => {
   if (typeof window !== "undefined") {

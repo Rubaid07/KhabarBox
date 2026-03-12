@@ -85,7 +85,7 @@ export default function PartnerSection() {
             </div>
           </div>
 
-          {/* Right Side - Image & Testimonial */}
+          {/* Right Side  */}
           <div className="relative">
             <Card className="relative h-125 lg:h-162.5 overflow-hidden border-0 shadow-2xl rounded-[2.5rem]">
               <Image

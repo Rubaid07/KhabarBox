@@ -1,38 +1,24 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default function proxy(request: NextRequest) {
-  const sessionCookie = request.cookies.get("better-auth.session_token");
+export function proxyLogic(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const sessionToken =
+    request.cookies.get("__Secure-better-auth.session_token")?.value ||
+    request.cookies.get("better-auth.session_token")?.value;
 
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/signup");
-  const isOrdersPage = pathname.startsWith("/orders");
-  const isCartPage = pathname.startsWith("/cart");
-  
-  const isDashboardPage = pathname.startsWith("/provider/dashboard") || pathname.startsWith("/admin/dashboard");
+  const protectedRoutes = ["/orders", "/cart", "/provider/dashboard", "/admin/dashboard"];
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
-  if (sessionCookie && isAuthPage) {
+  if (sessionToken && isAuthPage) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!sessionCookie && (isOrdersPage || isCartPage)) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (!sessionCookie && isDashboardPage) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (!sessionToken && isProtectedRoute) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    "/login", 
-    "/signup", 
-    "/orders/:path*", 
-    "/cart/:path*", 
-    "/provider/dashboard/:path*", 
-    "/admin/dashboard/:path*"
-  ],
-};

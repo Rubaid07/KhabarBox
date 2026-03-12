@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Heart, Truck, Clock, TrendingUp, Star } from "lucide-react";
+import { Truck, Clock, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TopRestaurantsDemo } from "./TopRestaurantsDemo";
 import Link from "next/link";

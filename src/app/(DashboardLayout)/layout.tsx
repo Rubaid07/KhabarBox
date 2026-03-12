@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { Roles } from "@/constants/roles";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import { toast } from "sonner";
 
 interface CustomUser {
   id: string;
@@ -30,23 +31,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     if (!isPending) {
       if (!isAuthenticated) {
         router.push("/login");
-        return;
-      }
-      if (userRole === Roles.customer) {
+      } else if (userRole === Roles.customer) {
+        toast.error("Access Denied");
         router.replace("/");
-        return;
-      }
-      if (pathname.startsWith("/admin") && userRole !== Roles.admin) {
+      } else if (pathname.startsWith("/admin") && userRole !== Roles.admin) {
+        toast.error("Unauthorized Admin Access");
         router.replace("/");
-        return;
-      }
-
-      if (pathname.startsWith("/provider") && userRole !== Roles.provider) {
+      } else if (pathname.startsWith("/provider") && userRole !== Roles.provider) {
+        toast.error("Unauthorized Provider Access");
         router.replace("/");
-        return;
       }
     }
-  }, [isPending, isAuthenticated, userRole, router, pathname]);
+  }, [isPending, isAuthenticated, userRole, pathname, router]);
 
   if (isPending) {
     return (
@@ -55,7 +51,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  if (!isAuthenticated || userRole === Roles.customer) return null;
+  const isAuthorized = 
+    (pathname.startsWith("/admin") && userRole === Roles.admin) ||
+    (pathname.startsWith("/provider") && userRole === Roles.provider);
+
+  if (!isAuthorized) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">

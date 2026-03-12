@@ -70,7 +70,6 @@ export default function SingleMealPage() {
       setLoading(true);
       const mealData = await getMealById(mealId);
       setMeal(mealData);
-      console.log(mealData);
 
       if (mealData.providerId) {
         const restaurantData = await getRestaurantById(mealData.providerId);
@@ -116,7 +115,6 @@ export default function SingleMealPage() {
   const currentUserId = session?.user?.id;
   const currentUserRole = (session?.user as { role?: string })?.role;
 
-  // Check if user can edit/delete review
   const canEditReview = (review: Review) => {
     return review.customer?.id === currentUserId;
   };
@@ -133,7 +131,7 @@ export default function SingleMealPage() {
     try {
       await deleteReview(reviewId);
       toast.success("Review deleted");
-      loadData(); // Refresh
+      loadData();
     } catch (error) {
       toast.error("Failed to delete review");
     }
@@ -181,7 +179,6 @@ export default function SingleMealPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Simple Navigation */}
       <div className="sticky top-22 z-10 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="">
@@ -197,7 +194,6 @@ export default function SingleMealPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section - Image + Basic Info */}
         <div className="bg-linear-to-br from-orange-50 to-white rounded-3xl p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             {/* Image - Small and Compact */}
@@ -308,7 +304,7 @@ export default function SingleMealPage() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Description & Reviews (2/3 width) */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
             {/* Description */}
             <div className="bg-gray-50 rounded-2xl p-6">
@@ -339,7 +335,7 @@ export default function SingleMealPage() {
                       className="bg-white border border-gray-200 rounded-xl p-4"
                     >
                       {editingReview === review.id ? (
-                        // Edit Mode
+                      
                         <div className="bg-orange-50 p-4 rounded-lg">
                           <h4 className="font-semibold text-gray-900 mb-3">
                             Edit Review
@@ -364,7 +360,6 @@ export default function SingleMealPage() {
                           </Button>
                         </div>
                       ) : (
-                        // View Mode
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold shrink-0">
                             {review.customer?.name?.charAt(0) || "U"}

@@ -70,15 +70,6 @@ export default function MealCard({ meal, index = 0 }: MealCardProps) {
           </div>
         )}
         
-        {/* HOT Badge */}
-        {index < 3 && (
-          <div className="absolute top-3 left-3 z-10">
-            <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
-              <Flame className="w-3 h-3" />
-              HOT
-            </span>
-          </div>
-        )}
 
         {/* Sold Out Badge */}
         {!meal.isAvailable && (

@@ -21,7 +21,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -57,7 +57,7 @@ const getAllUsers = async (options: UserFilterOptions) => {
   const cleanOptions = Object.fromEntries(
     Object.entries(options)
       .filter(([_, v]) => v !== undefined)
-      .map(([k, v]) => [k, String(v)])
+      .map(([k, v]) => [k, String(v)]),
   );
 
   const params = new URLSearchParams(cleanOptions).toString();
@@ -149,7 +149,6 @@ export default function AdminRestaurantsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // Get current page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
 
   useEffect(() => {
@@ -159,20 +158,19 @@ export default function AdminRestaurantsPage() {
   const loadProviders = async () => {
     try {
       setLoading(true);
-      const result = await getAllUsers({ 
-        page: currentPage, 
+      const result = await getAllUsers({
+        page: currentPage,
         limit: 12,
-        role: "PROVIDER"
+        role: "PROVIDER",
       });
-      
+
       const onlyProviders = result.data.filter(
         (u: { role: string }) => u.role === "PROVIDER",
       ) as Provider[];
-      
+
       setProviders(onlyProviders);
       setMeta(result.meta);
-      
-      // Load stats for each provider
+
       onlyProviders.forEach((provider: Provider) => {
         loadProviderStats(provider.id);
       });
@@ -213,7 +211,6 @@ export default function AdminRestaurantsPage() {
     }
   };
 
-  // Client-side filtering (applied after pagination)
   const filteredProviders = providers.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -353,10 +350,7 @@ export default function AdminRestaurantsPage() {
           <span className="font-medium text-gray-900">
             {filteredProviders.length}
           </span>{" "}
-          of{" "}
-          <span className="font-medium text-gray-900">
-            {meta.total}
-          </span>{" "}
+          of <span className="font-medium text-gray-900">{meta.total}</span>{" "}
           restaurants
         </p>
         <Badge variant="outline" className="px-3 py-1">
@@ -544,9 +538,7 @@ export default function AdminRestaurantsPage() {
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() =>
-                      router.push(`/restaurants/${provider.id}`)
-                    }
+                    onClick={() => router.push(`/restaurants/${provider.id}`)}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     View

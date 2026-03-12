@@ -1,6 +1,6 @@
 import { CreateOrderInput, Order } from "@/types/order";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "/api/main";
 
 export const getMyOrders = async (): Promise<Order[]> => {
  

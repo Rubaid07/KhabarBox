@@ -11,7 +11,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,12 +60,13 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const { data: authData, error: authError } = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
-        rememberMe: data.rememberMe,
-        callbackURL: "/",
-      });
+      const { data: authData, error: authError } =
+        await authClient.signIn.email({
+          email: data.email,
+          password: data.password,
+          rememberMe: data.rememberMe,
+          callbackURL: "/",
+        });
 
       if (authError) {
         throw new Error(authError.message || "Invalid email or password");
@@ -68,7 +76,8 @@ export function LoginForm() {
       router.push("/");
       router.refresh();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to login";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to login";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -80,11 +89,13 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "https://khabarbox.vercel.app",
-    });
+        provider: "google",
+        callbackURL: "https://khabarbox.vercel.app",
+        errorCallbackURL: "https://khabarbox.vercel.app/login",
+      });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Google login failed";
+      const errorMessage =
+        err instanceof Error ? err.message : "Google login failed";
       toast.error(errorMessage);
       setIsLoading(false);
     }
@@ -169,9 +180,7 @@ export function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <button
-                className="text-sm text-primary hover:underline cursor-pointer"
-              >
+              <button className="text-sm text-primary hover:underline cursor-pointer">
                 Forgot password?
               </button>
             </div>
@@ -206,7 +215,9 @@ export function LoginForm() {
             <Checkbox
               id="rememberMe"
               checked={rememberMe}
-              onCheckedChange={(checked) => setValue("rememberMe", checked as boolean)}
+              onCheckedChange={(checked) =>
+                setValue("rememberMe", checked as boolean)
+              }
             />
             <label
               htmlFor="rememberMe"

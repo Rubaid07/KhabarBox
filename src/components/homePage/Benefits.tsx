@@ -16,7 +16,7 @@ const benefitData = [
   {
     title: "Cash on Delivery (COD)",
     description: "No complex payment setups. Customers pay in cash upon delivery, ensuring a simple and trusted process for everyone.",
-    icon: Clock, // COD এর জন্য ঘড়ি বা হ্যান্ডওভার আইকন ভালো দেখায়
+    icon: Clock,
     colorClass: "bg-orange-50 text-orange-600",
   },
   {

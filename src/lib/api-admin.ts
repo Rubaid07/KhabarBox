@@ -57,7 +57,7 @@ export const getTopProviders = async (limit: number = 5) => {
   return json.data;
 };
 
-// Order Status Breakdown
+// Order Status
 export const getOrderStatusBreakdown = async () => {
   const res = await fetch(`${API_URL}/admin/stats/order-status`, {
     credentials: "include",

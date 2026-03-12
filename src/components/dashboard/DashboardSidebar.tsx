@@ -9,13 +9,9 @@ import {
   ShoppingBag,
   LogOut,
   Users,
-  BarChart3,
-  Star,
   ChefHat,
   Store,
   Package,
-  ShieldAlert,
-  Settings,
   Tag,
 } from "lucide-react";
 import Image from "next/image";

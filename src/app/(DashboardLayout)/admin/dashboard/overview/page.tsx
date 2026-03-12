@@ -41,6 +41,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { authClient } from "@/lib/auth-client";
+import { Roles } from "@/constants/roles";
 
 interface Stats {
   users: { total: number; providers: number; customers: number };
@@ -87,22 +89,27 @@ export default function AdminOverviewPage() {
   const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<7 | 30 | 90>(30);
+  const { data: session, isPending: isAuthPending } = authClient.useSession();
+  const user = session?.user as { role?: string } | undefined;
 
   useEffect(() => {
-    loadData();
-  }, [timeRange]);
+    if (!isAuthPending && user?.role === Roles.admin) {
+      loadData();
+    }
+  }, [timeRange, isAuthPending, session]);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [statsData, ordersData, providersData, statusData, revenueData] = await Promise.all([
-        getDashboardStats(),
-        getRecentOrders(5),
-        getTopProviders(5),
-        getOrderStatusBreakdown(),
-        getRevenueTrend(timeRange),
-      ]);
-      
+      const [statsData, ordersData, providersData, statusData, revenueData] =
+        await Promise.all([
+          getDashboardStats(),
+          getRecentOrders(5),
+          getTopProviders(5),
+          getOrderStatusBreakdown(),
+          getRevenueTrend(timeRange),
+        ]);
+
       setStats(statsData);
       setRecentOrders(ordersData);
       setTopProviders(providersData);
@@ -126,12 +133,19 @@ export default function AdminOverviewPage() {
     return colors[status] || "bg-gray-50 text-gray-700 border-gray-200";
   };
 
-  if (loading) {
+  if (isAuthPending || (loading && !stats)) {
     return <DashboardSkeleton />;
+  }
+  if (user?.role !== Roles.admin) {
+    return null;
   }
 
   const completionRate = stats?.orders.total
-    ? Math.round(((stats.orders.total - (stats.orders.pending || 0)) / stats.orders.total) * 100)
+    ? Math.round(
+        ((stats.orders.total - (stats.orders.pending || 0)) /
+          stats.orders.total) *
+          100,
+      )
     : 0;
 
   return (
@@ -144,8 +158,8 @@ export default function AdminOverviewPage() {
             Welcome back! Here&#39;s what&#39;s happening with your platform.
           </p>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           onClick={loadData}
           className="gap-2"
@@ -189,16 +203,27 @@ export default function AdminOverviewPage() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-base font-medium">Revenue Trend</CardTitle>
+              <CardTitle className="text-base font-medium">
+                Revenue Trend
+              </CardTitle>
               <p className="text-xs text-gray-500 mt-1">
                 Daily revenue for the last {timeRange} days
               </p>
             </div>
-            <Tabs value={timeRange.toString()} onValueChange={(v) => setTimeRange(Number(v) as 7 | 30 | 90)}>
+            <Tabs
+              value={timeRange.toString()}
+              onValueChange={(v) => setTimeRange(Number(v) as 7 | 30 | 90)}
+            >
               <TabsList className="h-8">
-                <TabsTrigger value="7" className="text-xs px-3">7d</TabsTrigger>
-                <TabsTrigger value="30" className="text-xs px-3">30d</TabsTrigger>
-                <TabsTrigger value="90" className="text-xs px-3">90d</TabsTrigger>
+                <TabsTrigger value="7" className="text-xs px-3">
+                  7d
+                </TabsTrigger>
+                <TabsTrigger value="30" className="text-xs px-3">
+                  30d
+                </TabsTrigger>
+                <TabsTrigger value="90" className="text-xs px-3">
+                  90d
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </CardHeader>
@@ -207,34 +232,45 @@ export default function AdminOverviewPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData}>
                   <defs>
-                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="revenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     tickFormatter={(value) => {
                       const date = new Date(value);
                       return `${date.getDate()}/${date.getMonth() + 1}`;
                     }}
                     tick={{ fontSize: 11 }}
                   />
-                  <YAxis 
-                    tickFormatter={(value) => `BDT ${value/1000}k`}
+                  <YAxis
+                    tickFormatter={(value) => `BDT ${value / 1000}k`}
                     tick={{ fontSize: 11 }}
                   />
-                  <Tooltip 
-                    formatter={(value: number) => [`BDT ${value.toLocaleString()}`, 'Revenue']}
-                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  <Tooltip
+                    formatter={(value: number) => [
+                      `BDT ${value.toLocaleString()}`,
+                      "Revenue",
+                    ]}
+                    labelFormatter={(label) =>
+                      new Date(label).toLocaleDateString()
+                    }
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#3b82f6" 
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#3b82f6"
                     strokeWidth={2}
-                    fill="url(#revenueGradient)" 
+                    fill="url(#revenueGradient)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -245,7 +281,9 @@ export default function AdminOverviewPage() {
         {/* Order Status Pie Chart */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Order Status</CardTitle>
+            <CardTitle className="text-base font-medium">
+              Order Status
+            </CardTitle>
             <p className="text-xs text-gray-500 mt-1">
               Distribution by current status
             </p>
@@ -264,7 +302,10 @@ export default function AdminOverviewPage() {
                     dataKey="value"
                   >
                     {statusBreakdown.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color || COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -274,9 +315,14 @@ export default function AdminOverviewPage() {
             <div className="grid grid-cols-2 gap-2 mt-2">
               {statusBreakdown.slice(0, 4).map((status) => (
                 <div key={status.name} className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: status.color || COLORS[0] }} />
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: status.color || COLORS[0] }}
+                  />
                   <span className="text-xs text-gray-600">{status.name}</span>
-                  <span className="text-xs font-medium ml-auto">{status.value}</span>
+                  <span className="text-xs font-medium ml-auto">
+                    {status.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -288,7 +334,9 @@ export default function AdminOverviewPage() {
         {/* Recent Orders */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Recent Orders</CardTitle>
+            <CardTitle className="text-base font-medium">
+              Recent Orders
+            </CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin/orders" className="gap-1 text-sm">
                 View all <ChevronRight className="h-4 w-4" />
@@ -338,7 +386,9 @@ export default function AdminOverviewPage() {
         {/* Top Restaurants */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Top Restaurants</CardTitle>
+            <CardTitle className="text-base font-medium">
+              Top Restaurants
+            </CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin/restaurants" className="gap-1 text-sm">
                 View all <ChevronRight className="h-4 w-4" />
@@ -443,15 +493,15 @@ export default function AdminOverviewPage() {
   );
 }
 
-function StatCard({ 
-  title, 
-  value, 
-  icon: Icon, 
-  subValue 
-}: { 
-  title: string; 
-  value: string; 
-  icon: LucideIcon; 
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  subValue,
+}: {
+  title: string;
+  value: string;
+  icon: LucideIcon;
   subValue: string;
 }) {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   Package,
   Search,
@@ -14,9 +14,7 @@ import {
   LucideIcon,
   RefreshCw,
   Store,
-  User,
   Calendar,
-  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -201,11 +199,11 @@ export default function AdminOrdersPage() {
       });
       setOrders(result.data);
       setMeta({
-  page: result.meta.page || currentPage,
-  limit: result.meta.limit || 10,
-  total: result.meta.total || 0,
-  totalPages: result.meta.totalPage || result.meta.totalPages || 1, 
-});
+        page: result.meta.page || currentPage,
+        limit: result.meta.limit || 10,
+        total: result.meta.total || 0,
+        totalPages: result.meta.totalPage || result.meta.totalPages || 1,
+      });
     } catch (error) {
       toast.error("Failed to load orders");
     } finally {
@@ -354,7 +352,7 @@ export default function AdminOrdersPage() {
         </Card>
       </div>
 
-      {/* Filters - ইউজার ম্যানেজমেন্টের মতো */}
+      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">

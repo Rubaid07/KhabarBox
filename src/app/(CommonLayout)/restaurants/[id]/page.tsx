@@ -73,7 +73,6 @@ export default function RestaurantProfilePage() {
 
   const rating = restaurant?.averageRating;
   const reviewCount = restaurant?.totalReviews || 0;
-  console.log(restaurant);
 
   if (loading) {
     return (
