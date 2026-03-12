@@ -353,19 +353,21 @@ export default function MealFilters() {
                                       : "hover:bg-gray-50"
                                   }`}
                                 >
-                                  {meal.imageUrl ? (
-                                    <Image
-                                      src={meal.imageUrl}
-                                      alt={meal.name || "Meal Image"}
-                                      fill
-                                      className="rounded-lg object-cover"
-                                      sizes="40px"
-                                    />
-                                  ) : (
-                                    <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-lg">
-                                      🍽️
-                                    </div>
-                                  )}
+                                  <div className="relative w-10 h-10 shrink-0">
+                                    {meal.imageUrl ? (
+                                      <Image
+                                        src={meal.imageUrl}
+                                        alt={meal.name || "Meal Image"}
+                                        fill
+                                        className="rounded-lg object-cover"
+                                        sizes="40px"
+                                      />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-lg">
+                                        🍽️
+                                      </div>
+                                    )}
+                                  </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium text-gray-900 truncate">
                                       {meal.name}
