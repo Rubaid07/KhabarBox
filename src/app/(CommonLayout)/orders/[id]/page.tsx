@@ -426,12 +426,11 @@ export default function OrderDetailsPage() {
                 <p className="text-sm text-gray-600 mb-4">
                   If you have any issues with your order, please contact us.
                 </p>
-                <Link
-                  href="/contact"
+                <button
                   className="text-orange-600 font-medium hover:underline text-sm"
                 >
-                  Contact Support →
-                </Link>
+                  Contact Support 
+                </button>
               </div>
             </div>
           </div>
