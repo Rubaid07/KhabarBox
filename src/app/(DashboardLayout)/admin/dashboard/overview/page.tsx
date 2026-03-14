@@ -358,7 +358,7 @@ export default function AdminOverviewPage() {
               Recent Orders
             </CardTitle>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/admin/orders" className="gap-1 text-sm">
+              <Link href="/admin/dashboard/orders" className="gap-1 text-sm">
                 View all <ChevronRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -410,7 +410,7 @@ export default function AdminOverviewPage() {
               Top Restaurants
             </CardTitle>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/admin/restaurants" className="gap-1 text-sm">
+              <Link href="/admin/dashboard/restaurants" className="gap-1 text-sm">
                 View all <ChevronRight className="h-4 w-4" />
               </Link>
             </Button>
