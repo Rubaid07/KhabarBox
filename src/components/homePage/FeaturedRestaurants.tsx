@@ -112,7 +112,7 @@ export default function FeaturedRestaurants() {
 
         {/* Restaurants Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {restaurants.map((restaurant, index) => {
+          {restaurants.slice(0, 3).map((restaurant, index) => {
             const imageUrl = restaurant.logoUrl || restaurant.user?.image;
             const rating = restaurant.averageRating || 0;
             const reviewCount = restaurant.totalReviews || 0;
