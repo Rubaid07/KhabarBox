@@ -209,9 +209,38 @@ async function RestaurantsContent() {
   ]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="flex flex-col lg:grid lg:grid-cols-4 gap-8">
+
+      {/* Right Column */}
+      <div className="lg:col-span-1 order-first lg:order-last">
+        <div className="sticky top-28">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 text-orange-500" />
+            Top Rated
+          </h2>
+
+          <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
+            {topRated.length > 0 ? (
+              topRated
+                .slice(0, 5)
+                .map((restaurant, index) => (
+                  <TopRatedCard
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                    rank={index + 1}
+                  />
+                ))
+            ) : (
+              <div className="text-center py-8 text-gray-500 text-sm">
+                No ratings yet
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Left Column */}
-      <div className="lg:col-span-3">
+      <div className="lg:col-span-3 order-last lg:order-first">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <Store className="w-5 h-5 text-orange-500" />
@@ -238,33 +267,6 @@ async function RestaurantsContent() {
         )}
       </div>
 
-      {/* Right Column */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-8">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-orange-500" />
-            Top Rated
-          </h2>
-
-          <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
-            {topRated.length > 0 ? (
-              topRated
-                .slice(0, 5)
-                .map((restaurant, index) => (
-                  <TopRatedCard
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                    rank={index + 1}
-                  />
-                ))
-            ) : (
-              <div className="text-center py-8 text-gray-500 text-sm">
-                No ratings yet
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
