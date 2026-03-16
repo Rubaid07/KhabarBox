@@ -68,7 +68,6 @@ KhabarBox is built around a strict **three-role architecture** — each role has
 | Technology | Version | Purpose |
 |---|---|---|
 | **Next.js** | 16.1.6 | React Framework (App Router) |
-| **React** | 19.2.3 | UI Library |
 | **TypeScript** | ^5 | Type Safety |
 | **Tailwind CSS** | ^4 | Utility-First Styling |
 | **shadcn/ui** | ^3.8.4 | Accessible UI Component Library |
